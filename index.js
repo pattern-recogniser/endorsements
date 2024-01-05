@@ -10,7 +10,10 @@ const database = getDatabase(app)
 const endorsementsInDB = ref(database, "endorsements")
 
 const publishEl = document.getElementById("publish-btn")
-const inputTextEl = document.getElementById("endorsement-input")
+const endorsementTextEl = document.getElementById("endorsement-input")
+const fromTextEl = document.getElementById("from-input")
+const toTextEl = document.getElementById("to-input")
+
 const endorsementListEl = document.getElementById("endorsement-container")
 
 onValue(endorsementsInDB, function(snapshot){
@@ -23,24 +26,19 @@ onValue(endorsementsInDB, function(snapshot){
 })
 publishEl.addEventListener("click", function(){
     // On clicking publish, add item to DB
-    let inputTextVal = inputTextEl.value
-    push(endorsementsInDB, inputTextVal)
-    inputTextEl.value = ""
+    let endorsementText = endorsementTextEl.value
+    let fromText = fromTextEl.value
+    let toText = toTextEl.value
+    let this_message = {
+        "from": fromText,
+        "to": toText,
+        "message": endorsementText
+    }
+    push(endorsementsInDB, this_message)
+    clearAllInputs([fromTextEl, toTextEl, endorsementTextEl])
 })
 
 
-function appendToEndorsements(endorsementListEl, textToAppend){
-    // Given an endorsement text to append, it displays in the list of
-    // endorsements
-    let newEndorsementP = document.createElement("p")
-    newEndorsementP.classList.add("endorsement");
-    newEndorsementP.textContent = textToAppend
-    endorsementListEl.append(newEndorsementP)
-}
-
-function clearEndorsementListEL(){
-    endorsementListEl.innerHTML = ""
-}
 
 function getElementsFromDBAndDisplay(snapshot){
     // Given a snapshot, retrieves elements from it
@@ -48,10 +46,57 @@ function getElementsFromDBAndDisplay(snapshot){
     clearEndorsementListEL()
     let itemsArray = Object.entries(snapshot.val())
     for (let i = 0; i < itemsArray.length; i++){
-        let currentItem = itemsArray[i]
-        let currentItemID = currentItem[0]
-        let currentItemValue = currentItem[1]
-        appendToEndorsements(endorsementListEl, currentItemValue)
+        let currentItem = itemsArray[i][1]
+        if(typeof currentItem === 'string'){
+            // Condition to retain old entries when the UI did not have 
+            // sender and receiver options
+            appendToEndorsements(endorsementListEl, currentItem, "sender", "receiver")
+        }
+        else if(typeof currentItem === 'object') {
+
+            let messageObject = currentItem
+            let sender = messageObject.from
+            let messageText = messageObject.message
+            let receiver = messageObject.to
+            appendToEndorsements(endorsementListEl, messageText, sender, receiver)
+        }
+
+    }
+}
+
+function appendToEndorsements(endorsementListEl, endorsementMessage, sender, receiver){
+    // Given an endorsement text to append, it displays in the list of
+    // endorsements
+    let newEndorsementP = getElement("p", "endorsement-p", endorsementMessage)
+    let newSenderP = getElement("p", "from-to-p", `From: ${sender}`)
+    let newReceiverP = getElement("p", "from-to-p", `To: ${receiver}`)
+    let newEndorsementDiv = getElement("div", "endorsement", ``)
+
+    // Creating the new endorsement message div
+    newEndorsementDiv.append(newReceiverP)
+    newEndorsementDiv.append(newEndorsementP)
+    newEndorsementDiv.append(newSenderP)
+
+    // Appending the new endorsement div to container
+    endorsementListEl.append(newEndorsementDiv)
+}
+
+function getElement(elementTypeStr, elementClassStr, elementTextContent){
+    let newElement = document.createElement(elementTypeStr)
+    newElement.classList.add(elementClassStr);
+    newElement.textContent = elementTextContent
+    return newElement
+}
+
+function clearEndorsementListEL(){
+    // Clears the endorsement container
+    endorsementListEl.innerHTML = ""
+}
+
+function clearAllInputs(inputList){
+    // Given a list of inputs, set the input text blank
+    for (let i = 0; i < inputList.length; i++){
+        inputList[i].value = ""
     }
 }
 
