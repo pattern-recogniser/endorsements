@@ -45,6 +45,12 @@ function getElementsFromDBAndDisplay(snapshot){
     // And then displays it
     clearEndorsementListEL()
     let itemsArray = Object.entries(snapshot.val())
+    // let res = JSON.parse(snapshot.val())
+    // for (const key in res){
+    //     if(obj.hasOwnProperty(key)){
+    //         console.log(`${key}: ${res[key]}`)
+    //     }
+    // }
     for (let i = 0; i < itemsArray.length; i++){
         let currentItem = itemsArray[i][1]
         if(typeof currentItem === 'string'){
@@ -53,7 +59,7 @@ function getElementsFromDBAndDisplay(snapshot){
             appendToEndorsements(endorsementListEl, currentItem, "sender", "receiver")
         }
         else if(typeof currentItem === 'object') {
-
+            // Actual flow
             let messageObject = currentItem
             let sender = messageObject.from
             let messageText = messageObject.message
