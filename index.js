@@ -15,29 +15,23 @@ const endorsementListEl = document.getElementById("endorsement-container")
 
 onValue(endorsementsInDB, function(snapshot){
     if (snapshot.exists()){
-        let itemsArray = Object.entries(snapshot.val())
-        clearEndorsementListEL()
-        for (let i = 0; i < itemsArray.length; i++){
-            let currentItem = itemsArray[i]
-            let currentItemID = currentItem[0]
-            let currentItemValue = currentItem[1]
-            appendToEndorsements(endorsementListEl, currentItemValue)
-        }
+        getElementsFromDBAndDisplay(snapshot)
     }
     else {
         endorsementListEl.innerHTML = `<p> No endorsements here yet.</p>`
     }
 })
 publishEl.addEventListener("click", function(){
+    // On clicking publish, add item to DB
     let inputTextVal = inputTextEl.value
-    console.log(inputTextVal)  
+    push(endorsementsInDB, inputTextVal)
     inputTextEl.value = ""
-    appendToEndorsements(endorsementListEl, inputTextVal)
 })
 
 
 function appendToEndorsements(endorsementListEl, textToAppend){
-    push(endorsementsInDB, textToAppend)
+    // Given an endorsement text to append, it displays in the list of
+    // endorsements
     let newEndorsementP = document.createElement("p")
     newEndorsementP.classList.add("endorsement");
     newEndorsementP.textContent = textToAppend
@@ -46,5 +40,18 @@ function appendToEndorsements(endorsementListEl, textToAppend){
 
 function clearEndorsementListEL(){
     endorsementListEl.innerHTML = ""
+}
+
+function getElementsFromDBAndDisplay(snapshot){
+    // Given a snapshot, retrieves elements from it
+    // And then displays it
+    clearEndorsementListEL()
+    let itemsArray = Object.entries(snapshot.val())
+    for (let i = 0; i < itemsArray.length; i++){
+        let currentItem = itemsArray[i]
+        let currentItemID = currentItem[0]
+        let currentItemValue = currentItem[1]
+        appendToEndorsements(endorsementListEl, currentItemValue)
+    }
 }
 
