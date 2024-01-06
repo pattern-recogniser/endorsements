@@ -16,14 +16,14 @@ const toTextEl = document.getElementById("to-input")
 
 const endorsementListEl = document.getElementById("endorsement-container")
 
-onValue(endorsementsInDB, function(snapshot){
-    if (snapshot.exists()){
-        getElementsFromDBAndDisplay(snapshot)
-    }
-    else {
-        endorsementListEl.innerHTML = `<p> No endorsements here yet.</p>`
-    }
-})
+// onValue(endorsementsInDB, function(snapshot){
+//     if (snapshot.exists()){
+//         getElementsFromDBAndDisplay(snapshot)
+//     }
+//     else {
+//         endorsementListEl.innerHTML = `<p> No endorsements here yet.</p>`
+//     }
+// })
 publishEl.addEventListener("click", function(){
     // On clicking publish, add item to DB
     let endorsementText = endorsementTextEl.value
@@ -45,37 +45,33 @@ function getElementsFromDBAndDisplay(snapshot){
     // And then displays it
     clearEndorsementListEL()
     let itemsArray = Object.entries(snapshot.val())
-    // let res = JSON.parse(snapshot.val())
-    // for (const key in res){
-    //     if(obj.hasOwnProperty(key)){
-    //         console.log(`${key}: ${res[key]}`)
-    //     }
-    // }
-    for (let i = 0; i < itemsArray.length; i++){
-        let currentItem = itemsArray[i][1]
-        if(typeof currentItem === 'string'){
+    let snapshotVal = snapshot.val()
+    snapshotVal = Object.fromEntries(Object.entries(snapshotVal).reverse())
+    for(let key in snapshotVal){
+        let keyVal = snapshotVal[key]
+        if(typeof keyVal === 'string'){
             // Condition to retain old entries when the UI did not have 
             // sender and receiver options
-            appendToEndorsements(endorsementListEl, currentItem, "sender", "receiver")
+            appendToEndorsements(endorsementListEl, keyVal, "sender", "receiver")
         }
-        else if(typeof currentItem === 'object') {
+        else if(typeof keyVal === 'object') {
             // Actual flow
-            let messageObject = currentItem
+            let messageObject = keyVal
             let sender = messageObject.from
             let messageText = messageObject.message
             let receiver = messageObject.to
             appendToEndorsements(endorsementListEl, messageText, sender, receiver)
         }
-
     }
+   
 }
 
 function appendToEndorsements(endorsementListEl, endorsementMessage, sender, receiver){
     // Given an endorsement text to append, it displays in the list of
     // endorsements
     let newEndorsementP = getElement("p", "endorsement-p", endorsementMessage)
-    let newSenderP = getElement("p", "from-to-p", `From: ${sender}`)
-    let newReceiverP = getElement("p", "from-to-p", `To: ${receiver}`)
+    let newSenderP = getElement("p", "from-p", `From: ${sender}`)
+    let newReceiverP = getElement("p", "to-p", `To: ${receiver}`)
     let newEndorsementDiv = getElement("div", "endorsement", ``)
 
     // Creating the new endorsement message div

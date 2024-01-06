@@ -81,11 +81,27 @@ h2{
     font-size: 14px;
     line-height: 17px;
     margin: 5px auto;
+    flex-wrap: wrap;
 }
-.from-to-p{
+.from-p, .to-p{
     font-weight: 700;
+}
+.from-p{
+    /* background-color: blue; */
+    display: flex;
+}
+.to-p{
+    display: block;
+}
+.likes{
+    color: red;
+    /* background-color: #28A9F1; */
+    float:right;
+    margin-left: auto;
 }
 .endorsement-p{
     margin-top: 8px;
     margin-bottom: 8px;
+    display: block;
+    width: 317px;
 }
