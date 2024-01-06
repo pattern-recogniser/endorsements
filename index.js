@@ -16,14 +16,14 @@ const toTextEl = document.getElementById("to-input")
 
 const endorsementListEl = document.getElementById("endorsement-container")
 
-// onValue(endorsementsInDB, function(snapshot){
-//     if (snapshot.exists()){
-//         getElementsFromDBAndDisplay(snapshot)
-//     }
-//     else {
-//         endorsementListEl.innerHTML = `<p> No endorsements here yet.</p>`
-//     }
-// })
+onValue(endorsementsInDB, function(snapshot){
+    if (snapshot.exists()){
+        getElementsFromDBAndDisplay(snapshot)
+    }
+    else {
+        endorsementListEl.innerHTML = `<p> No endorsements here yet.</p>`
+    }
+})
 publishEl.addEventListener("click", function(){
     // On clicking publish, add item to DB
     let endorsementText = endorsementTextEl.value
