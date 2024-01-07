@@ -1,6 +1,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"
 import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"
+import { doc, getDoc } from  "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js"
 
 const appSettings = {
     databaseURL : "https://realtime-database-76bbc-default-rtdb.europe-west1.firebasedatabase.app/"
@@ -24,20 +25,32 @@ onValue(endorsementsInDB, function(snapshot){
         endorsementListEl.innerHTML = `<p> No endorsements here yet.</p>`
     }
 })
-publishEl.addEventListener("click", function(){
+publishEl.addEventListener("click", function(e){
     // On clicking publish, add item to DB
+    // console.log(e.target)
     let endorsementText = endorsementTextEl.value
     let fromText = fromTextEl.value
     let toText = toTextEl.value
     let this_message = {
         "from": fromText,
         "to": toText,
-        "message": endorsementText
+        "message": endorsementText,
+        "likes": 0
     }
     push(endorsementsInDB, this_message)
     clearAllInputs([fromTextEl, toTextEl, endorsementTextEl])
 })
 
+endorsementListEl.addEventListener("click", function(e){
+    
+    if(e.target.getAttribute("class") === "likes"){
+        let grandparentID = (e.target.parentNode).parentNode.id
+        console.log(grandparentID)
+        addLikesToEndorsement(grandparentID)
+    }
+    
+    
+})
 
 
 function getElementsFromDBAndDisplay(snapshot){
@@ -52,7 +65,7 @@ function getElementsFromDBAndDisplay(snapshot){
         if(typeof keyVal === 'string'){
             // Condition to retain old entries when the UI did not have 
             // sender and receiver options
-            appendToEndorsements(endorsementListEl, keyVal, "sender", "receiver")
+            appendToEndorsements(endorsementListEl, keyVal, "sender", "receiver", "0", "key")
         }
         else if(typeof keyVal === 'object') {
             // Actual flow
@@ -60,24 +73,29 @@ function getElementsFromDBAndDisplay(snapshot){
             let sender = messageObject.from
             let messageText = messageObject.message
             let receiver = messageObject.to
-            appendToEndorsements(endorsementListEl, messageText, sender, receiver)
+            let likes = messageObject.likes
+            let id = key
+            appendToEndorsements(endorsementListEl, messageText, sender, receiver, likes, key)
         }
     }
    
 }
 
-function appendToEndorsements(endorsementListEl, endorsementMessage, sender, receiver){
+function appendToEndorsements(endorsementListEl, endorsementMessage, sender, receiver, likes, key){
     // Given an endorsement text to append, it displays in the list of
     // endorsements
     let newEndorsementP = getElement("p", "endorsement-p", endorsementMessage)
     let newSenderP = getElement("p", "from-p", `From: ${sender}`)
     let newReceiverP = getElement("p", "to-p", `To: ${receiver}`)
     let newEndorsementDiv = getElement("div", "endorsement", ``)
+    newEndorsementDiv.setAttribute("id", key)
+    let newLikesSpan = getElement("span", "likes", likes+"♥")
 
     // Creating the new endorsement message div
     newEndorsementDiv.append(newReceiverP)
     newEndorsementDiv.append(newEndorsementP)
     newEndorsementDiv.append(newSenderP)
+    newSenderP.append(newLikesSpan)
 
     // Appending the new endorsement div to container
     endorsementListEl.append(newEndorsementDiv)
@@ -102,3 +120,24 @@ function clearAllInputs(inputList){
     }
 }
 
+function addLikesToEndorsement(endorsementID){
+    // functionaltiy that increments likes by 1 in DB
+    // onValue(endorsementsInDB, function(snapshot){
+    //     let endorsementObject = snapshot.val()[endorsementID]
+    //     endorsementObject.likes += 1
+    //     console.log(endorsementObject)
+    //     push(endorsementsInDB, endorsementObject)
+    // })
+    // onValue(endorsementsInDB, function(snapshot){
+    //     let endorsementObject = snapshot.val()[endorsementID]
+    //     console.log(endorsementObject)
+    // })
+
+
+
+}
+
+// listen for click on which endorsement element has been clicked
+// which endorsement document relates to teh element the user clicked on
+// how many likes does that endorsement have
+// Has the user liked the endorsement previously

@@ -94,10 +94,13 @@ h2{
     display: block;
 }
 .likes{
-    color: red;
+    color: black;
     /* background-color: #28A9F1; */
     float:right;
     margin-left: auto;
+}
+.likes:hover{
+    color: red;
 }
 .endorsement-p{
     margin-top: 8px;
