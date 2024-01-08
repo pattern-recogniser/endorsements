@@ -14,3 +14,7 @@ Technologies used in the project:
 Html
 Css
 Javascript
+
+## Stretch Goals for future [TODO]
+- One user can only like an endorsement once
+- Build a desktop version for this - utilise the space
