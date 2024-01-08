@@ -98,6 +98,7 @@ h2{
     /* background-color: #28A9F1; */
     float:right;
     margin-left: auto;
+    user-select: none;
 }
 .likes:hover{
     color: red;

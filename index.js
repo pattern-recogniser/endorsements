@@ -1,6 +1,6 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"
+import { getDatabase, ref, push, onValue, child, get, update } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"
 import { doc, getDoc } from  "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js"
 
 const appSettings = {
@@ -35,7 +35,8 @@ publishEl.addEventListener("click", function(e){
         "from": fromText,
         "to": toText,
         "message": endorsementText,
-        "likes": 0
+        "likes": 0,
+        "isLiked": false
     }
     push(endorsementsInDB, this_message)
     clearAllInputs([fromTextEl, toTextEl, endorsementTextEl])
@@ -45,7 +46,6 @@ endorsementListEl.addEventListener("click", function(e){
     
     if(e.target.getAttribute("class") === "likes"){
         let grandparentID = (e.target.parentNode).parentNode.id
-        console.log(grandparentID)
         addLikesToEndorsement(grandparentID)
     }
     
@@ -122,17 +122,31 @@ function clearAllInputs(inputList){
 
 function addLikesToEndorsement(endorsementID){
     // functionaltiy that increments likes by 1 in DB
-    // onValue(endorsementsInDB, function(snapshot){
-    //     let endorsementObject = snapshot.val()[endorsementID]
-    //     endorsementObject.likes += 1
-    //     console.log(endorsementObject)
-    //     push(endorsementsInDB, endorsementObject)
-    // })
-    // onValue(endorsementsInDB, function(snapshot){
-    //     let endorsementObject = snapshot.val()[endorsementID]
-    //     console.log(endorsementObject)
-    // })
+    // Step 1: Get value of likes from DB
+    // Define what to write into DB
+    // Write into DB
+    // Update display -> OnValue will take care of that
 
+    let messageObject = {}
+    let updates = {}
+
+
+
+    get(child(endorsementsInDB, `${endorsementID}`)).then((snapshot) => {
+        let messageObject = snapshot.val()
+        // if (messageObject.isLiked === true){
+        //     console.log("already liked")
+        // }
+        // else {
+        messageObject.isLiked = !messageObject.isLiked
+        messageObject.likes += 1
+        updates[endorsementID] = messageObject
+        return update(endorsementsInDB, updates)
+        // }
+
+
+
+    })
 
 
 }
